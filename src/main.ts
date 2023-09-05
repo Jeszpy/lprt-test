@@ -1,25 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EnvVarsEnum } from './enums/env-vars.enum';
-import { useContainer } from 'class-validator';
+import { addSettingsToApp } from './helpers/add-settings-to-app';
 
 async function bootstrap() {
   const logger = new Logger('BOOTSTRAP');
   try {
     logger.verbose('Application start up');
-    const app = await NestFactory.create(AppModule);
-    const configService = app.get(ConfigService);
-    const port = parseInt(configService.get(EnvVarsEnum.PORT), 10);
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        stopAtFirstError: true,
-        transform: true,
-      }),
-    );
-    useContainer(app.select(AppModule), { fallbackOnErrors: true });
+    const initialApp: INestApplication = await NestFactory.create(AppModule);
+    const app: INestApplication = addSettingsToApp(initialApp);
+    const configService: ConfigService = app.get(ConfigService);
+    const port: number = parseInt(configService.get(EnvVarsEnum.PORT), 10);
     await app.listen(port, () =>
       logger.verbose(`Application successfully launched on port ${port}`),
     );
