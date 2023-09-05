@@ -3,3 +3,6 @@
 /.idea/
 
 .env
+.env.development
+.env.production
+.env.test
