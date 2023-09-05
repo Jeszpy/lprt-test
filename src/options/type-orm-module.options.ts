@@ -11,7 +11,7 @@ export class TypeOrmOptions implements TypeOrmOptionsFactory {
       type: 'postgres',
       url: this.configService.get(EnvVarsEnum.DB_URL),
       autoLoadEntities: true,
-      entities: ['dist/modules/**/entity/*.ts'],
+      entities: ['dist/modules/**/entities/*.entity.ts'],
       synchronize: true,
     };
   }
