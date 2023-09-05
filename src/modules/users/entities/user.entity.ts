@@ -1,19 +1,30 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  public id: string;
 
-  @Column({ type: 'varchar', length: 15, unique: true, nullable: false })
-  userName: string;
+  @Column({
+    type: 'varchar',
+    length: 15,
+    unique: true,
+    nullable: false,
+    collation: 'C',
+  })
+  public userName: string;
 
-  @Column({ type: 'varchar', unique: true, nullable: false })
-  email: string;
+  @Column({ type: 'varchar', unique: true, nullable: false, collation: 'C' })
+  public email: string;
 
   @Column({ type: 'varchar', unique: true, nullable: true })
-  phone: string | null;
+  public phone: string | null;
 
-  @Column({ type: 'varchar', nullable: false })
-  createdAt: string;
+  @CreateDateColumn()
+  public createdAt: string;
 }
