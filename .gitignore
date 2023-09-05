@@ -2,7 +2,7 @@
 /dist/
 /.idea/
 
-.env
-.env.development
 .env.production
+.env.development
 .env.test
+.env
