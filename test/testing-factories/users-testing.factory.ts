@@ -8,4 +8,8 @@ export class UsersTestingFactory {
   public async createUser(dto: CreateUserDto): Promise<request.Response> {
     return request(this.server).post(endpoints.users).send(dto);
   }
+
+  public async getAllUsers(): Promise<request.Response> {
+    return request(this.server).get(endpoints.users).send();
+  }
 }
