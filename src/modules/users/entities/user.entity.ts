@@ -2,8 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Vacancy } from '../../vacancies/entities/vacancy.entity';
 
 @Entity('users')
 export class User {
@@ -27,4 +29,7 @@ export class User {
 
   @CreateDateColumn()
   public createdAt: string;
+
+  @OneToMany(() => Vacancy, (v) => v.publisherId)
+  vacancies: Vacancy[];
 }
