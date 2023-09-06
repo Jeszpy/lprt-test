@@ -9,7 +9,9 @@ import { CreateUserDto } from '../src/modules/users/dto/create-user.dto';
 import { badReqErrorsGenerator } from './test-helpers';
 import { faker } from '@faker-js/faker';
 
-describe('AppController (e2e)', () => {
+describe('Users e2e tests', () => {
+  jest.setTimeout(15 * 1000);
+
   let app: INestApplication;
   let server: any;
   let usersFactory: UsersTestingFactory;
@@ -35,13 +37,13 @@ describe('AppController (e2e)', () => {
       expect(res.status).toBe(HttpStatus.NO_CONTENT);
 
       const usersRes = await usersFactory.getAllUsers();
-      expect(usersRes.status).toBe(200);
+      expect(usersRes.status).toBe(HttpStatus.OK);
       expect(usersRes.body).toHaveLength(0);
     });
     it('send empty body => should return 400 status code and validation errors', async () => {
       const emptyData = {} as CreateUserDto;
       const errors = badReqErrorsGenerator(['userName', 'email']);
-      const res = await usersFactory.createUser(emptyData);
+      const res = await usersFactory.createUserRawReq(emptyData);
 
       expect(res.status).toBe(HttpStatus.BAD_REQUEST);
       expect(res.body).toStrictEqual(errors);
@@ -54,20 +56,20 @@ describe('AppController (e2e)', () => {
         phone: '',
       };
       const errors = badReqErrorsGenerator(['userName', 'email', 'phone']);
-      const res = await usersFactory.createUser(emptyStringsData);
+      const res = await usersFactory.createUserRawReq(emptyStringsData);
 
       expect(res.status).toBe(HttpStatus.BAD_REQUEST);
       expect(res.body).toStrictEqual(errors);
     });
 
     it('iterate over string lengths => should return 400 status code and validation errors', async () => {
-      const emptyStringsData: CreateUserDto = {
+      const invalidData: CreateUserDto = {
         userName: faker.lorem.paragraphs(10),
         email: faker.lorem.paragraphs(10),
         phone: faker.lorem.paragraphs(10),
       };
       const errors = badReqErrorsGenerator(['userName', 'email', 'phone']);
-      const res = await usersFactory.createUser(emptyStringsData);
+      const res = await usersFactory.createUserRawReq(invalidData);
 
       expect(res.status).toBe(HttpStatus.BAD_REQUEST);
       expect(res.body).toStrictEqual(errors);
@@ -75,15 +77,12 @@ describe('AppController (e2e)', () => {
 
     it('input of correct data => should return 201 status code and created user', async () => {
       const usersResBeforeCreate = await usersFactory.getAllUsers();
-      expect(usersResBeforeCreate.status).toBe(200);
+      expect(usersResBeforeCreate.status).toBe(HttpStatus.OK);
       expect(usersResBeforeCreate.body).toHaveLength(0);
 
-      const correctData: CreateUserDto = {
-        userName: faker.string.sample({ min: 3, max: 15 }),
-        email: faker.internet.email(),
-        phone: faker.phone.number('+48 91 ### ## ##'),
-      };
-      const res = await usersFactory.createUser(correctData);
+      const correctData: CreateUserDto = usersFactory.getValidInputData();
+
+      const res = await usersFactory.createUserRawReq(correctData);
 
       expect(res.status).toBe(HttpStatus.CREATED);
       const createdUser = res.body;
@@ -96,7 +95,7 @@ describe('AppController (e2e)', () => {
       });
 
       const usersResAfterCreate = await usersFactory.getAllUsers();
-      expect(usersResAfterCreate.status).toBe(200);
+      expect(usersResAfterCreate.status).toBe(HttpStatus.OK);
       expect(usersResAfterCreate.body).toHaveLength(1);
       expect(usersResAfterCreate.body[0]).toEqual(createdUser);
 
@@ -111,10 +110,41 @@ describe('AppController (e2e)', () => {
         phone: user.phone,
       };
       const errors = badReqErrorsGenerator(['userName', 'email', 'phone']);
-      const res = await usersFactory.createUser(notUniqueData);
+      const res = await usersFactory.createUserRawReq(notUniqueData);
 
       expect(res.status).toBe(HttpStatus.BAD_REQUEST);
       expect(res.body).toStrictEqual(errors);
+    });
+  });
+
+  describe('create user tests', () => {
+    const countOfUsers = 100;
+    it('should wipe all data before test', async () => {
+      const res = await request(server)
+        .delete(endpoints.testing.wipeAllData)
+        .send();
+
+      expect(res.status).toBe(HttpStatus.NO_CONTENT);
+
+      const usersRes = await usersFactory.getAllUsers();
+
+      expect(usersRes.status).toBe(HttpStatus.OK);
+      expect(usersRes.body).toHaveLength(0);
+    });
+    it('prepare data for test', async () => {
+      const createdUsers = await usersFactory.createUsers(countOfUsers);
+
+      expect(createdUsers).toHaveLength(countOfUsers);
+      expect.setState({ users: createdUsers });
+    });
+
+    it('get all users => should return 200 status code and all created users', async () => {
+      const { users } = expect.getState();
+      const getAllUsersRes = await usersFactory.getAllUsers();
+
+      expect(getAllUsersRes.status).toBe(HttpStatus.OK);
+      expect(getAllUsersRes.body).toHaveLength(countOfUsers);
+      expect(getAllUsersRes.body).toStrictEqual(expect.arrayContaining(users));
     });
   });
 });
