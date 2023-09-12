@@ -4,7 +4,7 @@ export enum NodeEnvEnum {
   TEST = 'test',
 }
 
-export enum EnvVarsEnum {
+export enum EnvVarsEnums {
   NODE_ENV = 'NODE_ENV',
   PORT = 'PORT',
   DB_URL = 'DB_URL',

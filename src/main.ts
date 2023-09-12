@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { INestApplication, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { EnvVarsEnum } from './enums/env-vars.enum';
+import { EnvVarsEnums } from './enums/env-vars.enums';
 import { addSettingsToApp } from './helpers/add-settings-to-app';
 
 async function bootstrap() {
@@ -12,7 +12,7 @@ async function bootstrap() {
     const initialApp: INestApplication = await NestFactory.create(AppModule);
     const app: INestApplication = addSettingsToApp(initialApp);
     const configService: ConfigService = app.get(ConfigService);
-    const port: number = parseInt(configService.get(EnvVarsEnum.PORT), 10);
+    const port: number = parseInt(configService.get(EnvVarsEnums.PORT), 10);
     await app.listen(port, () =>
       logger.verbose(`Application successfully launched on port ${port}`),
     );

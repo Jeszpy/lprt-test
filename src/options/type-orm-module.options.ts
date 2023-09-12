@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { EnvVarsEnum } from '../enums/env-vars.enum';
+import { EnvVarsEnums } from '../enums/env-vars.enums';
 
 @Injectable()
 export class TypeOrmOptions implements TypeOrmOptionsFactory {
@@ -9,7 +9,7 @@ export class TypeOrmOptions implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      url: this.configService.get(EnvVarsEnum.DB_URL),
+      url: this.configService.get(EnvVarsEnums.DB_URL),
       autoLoadEntities: true,
       entities: ['dist/modules/**/entities/*.entity.ts'],
       synchronize: true,

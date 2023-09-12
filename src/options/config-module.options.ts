@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import { ConfigService } from '@nestjs/config';
-import { EnvVarsEnum, NodeEnvEnum } from '../enums/env-vars.enum';
+import { EnvVarsEnums, NodeEnvEnum } from '../enums/env-vars.enums';
 
 export const ConfigModuleOptions = () => {
   const configService = new ConfigService();
@@ -13,6 +13,6 @@ export const ConfigModuleOptions = () => {
       PORT: Joi.number().required(),
       DB_URL: Joi.string().required(),
     }),
-    envFilePath: `.env.${configService.get(EnvVarsEnum.NODE_ENV)}`,
+    envFilePath: `.env.${configService.get(EnvVarsEnums.NODE_ENV)}`,
   };
 };
