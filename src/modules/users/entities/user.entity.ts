@@ -30,6 +30,7 @@ export class User {
   @CreateDateColumn()
   public createdAt: string;
 
-  @OneToMany(() => Vacancy, (v) => v.publisherId)
+  // @OneToMany(() => Vacancy, (v) => v.publisherId)
+  @OneToMany(() => Vacancy, (v) => v.publisher)
   vacancies: Vacancy[];
 }
